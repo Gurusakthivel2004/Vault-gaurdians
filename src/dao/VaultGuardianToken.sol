@@ -14,6 +14,7 @@ contract VaultGuardianToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
         super._update(from, to, value);
     }
 
+    // @audit-info Returns the next unused nonce for an address.
     function nonces(address ownerOfNonce) public view override(ERC20Permit, Nonces) returns (uint256) {
         return super.nonces(ownerOfNonce);
     }

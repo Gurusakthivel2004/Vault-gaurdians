@@ -15,9 +15,6 @@ contract VaultShares is ERC4626, IVaultShares, AaveAdapter, UniswapAdapter, Reen
     error VaultShares__AllocationNot100Percent(uint256 totalAllocation);
     error VaultShares__NotActive();
 
-    /*//////////////////////////////////////////////////////////////
-                            STATE VARIABLES
-    //////////////////////////////////////////////////////////////*/
     IERC20 internal immutable i_uniswapLiquidityToken;
     IERC20 internal immutable i_aaveAToken;
     address private immutable i_guardian;
@@ -25,20 +22,19 @@ contract VaultShares is ERC4626, IVaultShares, AaveAdapter, UniswapAdapter, Reen
     uint256 private immutable i_guardianAndDaoCut;
     bool private s_isActive;
 
+    // struct AllocationData {
+    //     uint256 holdAllocation; // hodl
+    //     uint256 uniswapAllocation; // Simmilar to T-Swap
+    //     uint256 aaveAllocation; // Similar to Thunder Loan
+    // }
     AllocationData private s_allocationData;
 
     uint256 private constant ALLOCATION_PRECISION = 1_000;
 
-    /*//////////////////////////////////////////////////////////////
-                                 EVENTS
-    //////////////////////////////////////////////////////////////*/
+    // @audit-low allocationData field can be indexed.
     event UpdatedAllocation(AllocationData allocationData);
     event NoLongerActive();
     event FundsInvested();
-
-    /*//////////////////////////////////////////////////////////////
-                               MODIFIERS
-    //////////////////////////////////////////////////////////////*/
 
     modifier onlyGuardian() {
         if (msg.sender != i_guardian) {
@@ -83,9 +79,6 @@ contract VaultShares is ERC4626, IVaultShares, AaveAdapter, UniswapAdapter, Reen
     }
     // slither-disable-end reentrancy-eth
 
-    /*//////////////////////////////////////////////////////////////
-                               FUNCTIONS
-    //////////////////////////////////////////////////////////////*/
     // We use a struct to avoid stack too deep errors. Thanks Solidity
     constructor(ConstructorData memory constructorData)
         ERC4626(constructorData.asset)
@@ -99,7 +92,6 @@ contract VaultShares is ERC4626, IVaultShares, AaveAdapter, UniswapAdapter, Reen
         s_isActive = true;
         updateHoldingAllocation(constructorData.allocationData);
 
-        // External calls
         i_aaveAToken =
             IERC20(IPool(constructorData.aavePool).getReserveData(address(constructorData.asset)).aTokenAddress);
         i_uniswapLiquidityToken = IERC20(i_uniswapFactory.getPair(address(constructorData.asset), address(i_weth)));
@@ -201,9 +193,6 @@ contract VaultShares is ERC4626, IVaultShares, AaveAdapter, UniswapAdapter, Reen
     // slither-disable-end reentrancy-eth
     // slither-disable-end reentrancy-benign
 
-    /*//////////////////////////////////////////////////////////////
-                             VIEW AND PURE
-    //////////////////////////////////////////////////////////////*/
     function getGuardian() external view returns (address) {
         return i_guardian;
     }

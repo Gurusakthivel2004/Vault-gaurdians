@@ -44,7 +44,7 @@ contract UniswapAdapter is AStaticUSDCData {
             to: address(this),
             deadline: block.timestamp
         });
-
+        
         succ = counterPartyToken.approve(address(i_uniswapRouter), amounts[1]);
         if (!succ) {
             revert UniswapAdapter__TransferFailed();
